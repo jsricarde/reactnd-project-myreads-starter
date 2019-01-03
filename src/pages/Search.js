@@ -10,11 +10,28 @@ export default class Search extends Component {
     books: []
   }
 
+  compareBooks(books){
+    const { shelfBooks } = this.props;
+    return (books && Array.isArray(books) && books.length > 0) ? books.map(book => {
+      const id = book.id;
+      const foundBook = shelfBooks.find(shelfBook => {
+        return shelfBook.id === id;
+      })
+      if(foundBook) {
+        book.shelf = foundBook.shelf;
+      }
+      return book;
+    }) : books;
+  }
+
   updateQuery = (event) => {
     event.preventDefault();
     const query = event.target.value;
     this.setState({ query })
-    search(query).then().then(books => this.setState({ books }))
+    search(query).then(books => {
+      const comparedBooks = this.compareBooks(books);
+      this.setState({ books: comparedBooks })
+    })
   }
 
   render() {
@@ -49,5 +66,6 @@ export default class Search extends Component {
 }
 
 Search.propTypes = {
-  updateBook: PropTypes.func.isRequired
+  updateBook: PropTypes.func.isRequired,
+  shelfBooks: PropTypes.array.isRequired,
 };

@@ -15,21 +15,27 @@ class BooksApp extends React.Component {
 
   updateBook = (book, shelf) => {
     update(book, shelf).then(() => {
-      getAll()
-        .then(books => this.setState({ books }))
+      const { books } = this.state
+      const updatedBooks = books.map(foundedBook => {
+        if(foundedBook.id === book.id) {
+          foundedBook.shelf = shelf
+        }
+        return foundedBook
+      });
+      this.setState({ books: updatedBooks})
     })
   }
 
   render() {
+    const { books } = this.state;
     return (
       <div>
         <Route exact path='/' render={()=>(
-          <Main books={this.state.books} updateBook={this.updateBook} />
+          <Main books={books} updateBook={this.updateBook} />
         )}/>
-        <Route path='/search' render={({ history })=>(
-          <Search updateBook={(book, shelf) => {
+        <Route path='/search' render={()=>(
+          <Search shelfBooks={books} updateBook={(book, shelf) => {
             this.updateBook(book, shelf)
-            history.push('/')
           }} />
         )}/>
       </div>
